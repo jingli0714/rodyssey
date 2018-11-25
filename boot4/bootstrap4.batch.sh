@@ -1,0 +1,37 @@
+#! /usr/bin/env Rscript
+#SBATCH -p shared
+#SBATCH --mem 2g
+#SBATCH -t 0-06:00
+#SBATCH -c 20              # requesting more cores
+#SBATCH -n 2               # possibly on more nodes
+#SBATCH -o out_%A_%a.out   # standard output
+#SBATCH -e err_%A_%a.out   # standard error
+#SBATCH -a 1-20            # array of 20 jobs, with ids 1, 2, ...40
+
+library(parallel)
+
+g <- expand.grid(nrep = c(10, 10000), ncores = 1:20) # one row per job
+
+boot_onestep <- function(i) {
+  didx <- mtcars[sample(1:nrow(mtcars), replace = TRUE, nrow(mtcars)), ]
+  xidx <- cbind(1, didx$wt, didx$hp); yidx <- didx$mpg
+  coeffidx <- solve(t(xidx) %*% xidx) %*% t(xidx) %*% yidx
+  return(t(coeffidx))
+}
+
+
+if (Sys.getenv("SLURM_JOB_ID") != "") {
+  
+  id <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))
+  id_nrep <- g$nrep[id]
+  id_ncores <- g$ncores[id]
+  
+  s <- system.time(b <- t(mcmapply(boot_onestep, 1:id_nrep, mc.cores = id_ncores)))
+  
+  print(s)
+  
+  d <- data.frame(id_nrep, id_ncores, s[3])
+  rownames(d) <- NULL
+  colnames(d) <- NULL
+  write.table(d, "results.txt", append = TRUE, row.names = FALSE, col.names = FALSE)
+}
