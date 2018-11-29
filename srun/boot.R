@@ -11,5 +11,6 @@ boot_onestep <- function(i) {
 b_nrep10_c_1 <- t(mcmapply(boot_onestep, 1:10, mc.cores = 1))
 b_nrep10_c_1
 
-system.time(b_nrep10000_c_1 <- t(mcmapply(boot_onestep, 1:10000, mc.cores = 1)))
+system.time(b_nrep10000_c_1 <- t(mcmapply(boot_onestep, 1:10, mc.cores = 1)))
+system.time(b_nrep10000_c_10 <- t(mcmapply(boot_onestep, 1:10, mc.cores = 10)))
 system.time(b_nrep10000_c_10 <- t(mcmapply(boot_onestep, 1:10000, mc.cores = 10)))
