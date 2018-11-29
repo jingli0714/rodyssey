@@ -6,7 +6,7 @@
 #SBATCH -n 2               # possibly on more nodes
 #SBATCH -o out_%A_%a.out   # standard output
 #SBATCH -e err_%A_%a.out   # standard error
-#SBATCH -a 1-20            # array of 20 jobs, with ids 1, 2, ...40
+#SBATCH -a 1-40            # array of 20 jobs, with ids 1, 2, ...40
 
 library(parallel)
 
